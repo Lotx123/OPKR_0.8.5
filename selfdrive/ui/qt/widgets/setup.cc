@@ -108,9 +108,9 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
     return;
   }
 
-  // QString url = "https://api.commadotai.com/v1/devices/" + dongleId + "/owner";
-  // RequestRepeater *repeater = new RequestRepeater(this, url, "ApiCache_Owner", 6);
-  // QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &PrimeUserWidget::replyFinished);
+  QString url = "https://api.commadotai.com/v1/devices/" + dongleId + "/owner";
+  RequestRepeater *repeater = new RequestRepeater(this, url, "ApiCache_Owner", 86400); // 6
+  QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &PrimeUserWidget::replyFinished);
 }
 
 void PrimeUserWidget::replyFinished(const QString &response) {
@@ -156,7 +156,8 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
   QVBoxLayout* finishRegistationLayout = new QVBoxLayout;
   finishRegistationLayout->setMargin(30);
 
-  QLabel* registrationDescription = new QLabel("COMMA CONNECT 앱을 이용하여 장치를 페어링 하세요");
+  QLabel* registrationDescription = new QLabel("QR코드 스캐너를 이용하여\n장치를 페어링 하세요");
+  //QLabel* registrationDescription = new QLabel("COMMA CONNECT 앱을 이용하여 장치를 페어링 하세요");
   registrationDescription->setWordWrap(true);
   registrationDescription->setAlignment(Qt::AlignCenter);
   registrationDescription->setStyleSheet(R"(
@@ -166,7 +167,8 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
 
   finishRegistationLayout->addWidget(registrationDescription);
 
-  QPushButton* finishButton = new QPushButton("설정 및 완료");
+  QPushButton* finishButton = new QPushButton("QR코드 확인");
+  //QPushButton* finishButton = new QPushButton("설정 및 완료");
   finishButton->setFixedHeight(200);
   finishButton->setStyleSheet(R"(
     border-radius: 30px;
@@ -232,7 +234,7 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
   // set up API requests
   QString dongleId = QString::fromStdString(Params().get("DongleId"));
   QString url = "https://api.commadotai.com/v1.1/devices/" + dongleId + "/";
-  RequestRepeater* repeater = new RequestRepeater(this, url, "ApiCache_Device", 5);
+  RequestRepeater* repeater = new RequestRepeater(this, url, "ApiCache_Device", 86400); // 5
 
   QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &SetupWidget::replyFinished);
   QObject::connect(repeater, &RequestRepeater::failedResponse, this, &SetupWidget::parseError);
