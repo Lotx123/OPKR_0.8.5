@@ -100,10 +100,15 @@ def create_lfahda_mfc(packer, frame, enabled, hda_set_speed=0):
 
   return packer.make_can_msg("LFAHDA_MFC", 0, values)
 
-def create_scc11(packer, frame, set_speed, lead_visible, scc_live, lead_dist, lead_vrel, lead_yrel, car_fingerprint, speed, scc11):
+def create_scc11(packer, frame, set_speed, lead_visible, scc_live, lead_dist, lead_vrel, lead_yrel, car_fingerprint, speed, standstill, scc11):
   values = scc11
   values["AliveCounterACC"] = frame // 2 % 0x10
-  if not scc_live:
+  if not scc_live or (car_fingerprint == CAR.NIRO_HEV and speed <= 11):
+    if standstill:
+      values["SCCInfoDisplay"] = 4
+    else:
+      values["SCCInfoDisplay"] = 0
+    values["DriverAlertDisplay"] = 0
     values["MainMode_ACC"] = 1
     values["VSetDis"] = set_speed
     values["ObjValid"] = lead_visible
@@ -130,10 +135,18 @@ def create_scc12(packer, apply_accel, enabled, scc_live, gaspressed, brakepresse
       values["aReqRaw"] = 0
       values["aReqValue"] = 0
     values["CR_VSM_ChkSum"] = 0
+  if car_fingerprint == CAR.NIRO_HEV and speed <= 11:
+    values["AEB_CmdAct"] = 1 if enabled else 0
+    values["ACCMode"] = 2 if gaspressed and (apply_accel > -0.2) else 1
+    values["aReqRaw"] = apply_accel
+    values["aReqValue"] = apply_accel
+    dat = packer.make_can_msg("SCC12", 0, values)[2]
+    values["CR_VSM_ChkSum"] = 16 - sum([sum(divmod(i, 16)) for i in dat]) % 16
   if not scc_live:
     values["ACCMode"] = 1 if enabled else 0 # 2 if gas padel pressed
     dat = packer.make_can_msg("SCC12", 0, values)[2]
     values["CR_VSM_ChkSum"] = 16 - sum([sum(divmod(i, 16)) for i in dat]) % 16
+
   return packer.make_can_msg("SCC12", 0, values)
 
 def create_scc13(packer, scc13):
@@ -157,6 +170,13 @@ def create_scc14(packer, enabled, scc14, aebcmdact, lead_visible, lead_dist, v_e
       values["ComfortBandUpper"] = 50.
       values["ComfortBandLower"] = 50.
   elif enabled and not aebcmdact:
+    values["JerkUpperLimit"] = 12.7
+    values["JerkLowerLimit"] = 12.7
+    values["ComfortBandUpper"] = 0
+    values["ComfortBandLower"] = 0
+    values["ACCMode"] = 1 if enabled else 4 # stock will always be 4 instead of 0 after first disengage
+    values["ObjGap"] = int(min(lead_dist+2, 10)/2) if lead_visible else 0 # 1-5 based on distance to lead vehicle
+  elif enabled and car_fingerprint == CAR.NIRO_HEV and v_ego*3.6 <= 11:
     values["JerkUpperLimit"] = 12.7
     values["JerkLowerLimit"] = 12.7
     values["ComfortBandUpper"] = 0
