@@ -30,7 +30,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.carName = "hyundai"
     ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
-    if candidate in [CAR.GRANDEUR_IG_FL_HEV, CAR.GRANDEUR_IG_FL]:
+    if candidate in [CAR.KONA_HEV, CAR.GRANDEUR_IG_FL_HEV, CAR.GRANDEUR_IG_FL]:
       ret.safetyModel = car.CarParams.SafetyModel.hyundai
     #if candidate in [CAR.SONATA]:
     #  ret.safetyModel = car.CarParams.SafetyModel.hyundai
@@ -146,8 +146,8 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1275. + STD_CARGO_KG
       ret.wheelbase = 2.7
     elif candidate in [CAR.KONA_HEV, CAR.KONA_EV]:
-      ret.mass = 1685. + STD_CARGO_KG
-      ret.wheelbase = 2.7
+      ret.mass = 1425. + STD_CARGO_KG
+      ret.wheelbase = 2.6
     elif candidate in [CAR.IONIQ_HEV, CAR.IONIQ_EV]:
       ret.mass = 1490. + STD_CARGO_KG   #weight per hyundai site https://www.hyundaiusa.com/ioniq-electric/specifications.aspx
       ret.wheelbase = 2.7
@@ -218,14 +218,14 @@ class CarInterface(CarInterfaceBase):
     ret.brakeMaxV = [0.7, 3.0]   # max brake allowed
 
     ret.longitudinalTuning.kpBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kpV = [1.5, 1.2, 1.0, 0.4, 0.35, 0.3]
+    ret.longitudinalTuning.kpV = [1.3, 1.0, 0.6, 0.4, 0.3, 0.2]
     ret.longitudinalTuning.kiBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kiV = [0.21, 0.16, 0.11, 0.04, 0.03, 0.02]
+    ret.longitudinalTuning.kiV = [0.05, 0.1, 0.05, 0.04, 0.03, 0.02]
 
     ret.longitudinalTuning.deadzoneBP = [0., 9., 17.]
     ret.longitudinalTuning.deadzoneV = [0., 0.005, 0.01]
     ret.longitudinalTuning.kdBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kdV = [0.1, 0.2, 0.35, 0.55, 0.65, 0.9]
+    ret.longitudinalTuning.kdV = [0.5, 0.6, 0.5, 0.4, 0.3, 0.2]
 
     ret.enableCamera = True
     ret.enableBsm = 0x58b in fingerprint[0]

@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include "selfdrive/hardware/hw.h"
+#include "selfdrive/common/params.h"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
   main_layout = new QStackedLayout;
@@ -36,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
   QObject::connect(&qs, &QUIState::uiUpdate, &device, &Device::update);
   QObject::connect(&qs, &QUIState::offroadTransition, this, &MainWindow::offroadTransition);
   QObject::connect(&device, &Device::displayPowerChanged, this, &MainWindow::closeSettings);
+  QObject::connect(&device, &Device::displayPowerChanged, this, &MainWindow::forceShutdownStat);
 
   // load fonts
   QFontDatabase::addApplicationFont("../assets/fonts/opensans_regular.ttf");
@@ -68,6 +70,11 @@ void MainWindow::closeSettings() {
   }
 }
 
+void MainWindow::forceShutdownStat() {
+  Params().put("OpkrForceShutdownTrigger", "1", 1);
+}
+
+
 void MainWindow::reviewTrainingGuide() {
   onboardingDone = false;
   main_layout->setCurrentWidget(onboardingWindow);
@@ -78,6 +85,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event){
   // wake screen on tap
   if (event->type() == QEvent::MouseButtonPress) {
     device.setAwake(true, true);
+    Params().put("OpkrForceShutdownTrigger", "0", 1);
   }
 
 #ifdef QCOM
