@@ -679,7 +679,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
   },
 
   EventName.tooDistracted: {
-    ET.NO_ENTRY: NoEntryAlert("운전자 전방주시 매우 불안"),
+    ET.WARNING: Alert(
+      "도로상황에 주의하세요",
+      "운전자 전방주시 필요",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.chimeWarning1, .1, .1, .1),
   },
 
   EventName.overheat: {
