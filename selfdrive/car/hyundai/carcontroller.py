@@ -25,9 +25,7 @@ import common.log as trace1
 import common.CTime1000 as tm
 from random import randint
 
-LaneChangeState = log.LateralPlan.LaneChangeState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
-min_set_speed = 30 * CV.KPH_TO_MS
 
 # Accel limits
 ACCEL_HYST_GAP = 0.02  # don't change accel command for small oscillations within this value
@@ -203,7 +201,7 @@ class CarController():
 
     self.p = CarControllerParams
     self.sm = messaging.SubMaster(['controlsState'])
-  def update(self, enabled, CS, frame, CC, actuators, pcm_cancel_cmd, visual_alert,
+  def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert,
              left_lane, right_lane, left_lane_depart, right_lane_depart, set_speed, lead_visible, lead_dist, lead_vrel, lead_yrel, sm):
 
     # *** compute control surfaces ***
@@ -335,8 +333,8 @@ class CarController():
       can_sends.append(create_lkas11(self.packer, frame, self.car_fingerprint, apply_steer, lkas_active,
                                    self.steer_wind_down, CS.lkas11, sys_warning, sys_state, enabled, left_lane, right_lane,
                                    left_lane_warning, right_lane_warning, 1))
-    if frame % 2 and CS.CP.mdpsBus: # send clu11 to mdps if it is not on bus 0
-      can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.NONE, enabled_speed, CS.CP.mdpsBus))
+      if frame % 2: # send clu11 to mdps if it is not on bus 0
+        can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.NONE, enabled_speed, CS.CP.mdpsBus))
 
     str_log1 = 'CV={:03.0f}  AS={:03.1f}  TQ={:03.0f}  ST={:03.0f}/{:01.0f}/{:01.0f} AQ={:+04.2f}'.format(abs(self.curve_speed), abs(self.anglesteer_desire), abs(new_steer), max(self.steerMax, abs(new_steer)), self.steerDeltaUp, self.steerDeltaDown, CS.scc12["aReqValue"])
 
@@ -546,7 +544,7 @@ class CarController():
           elif aReqValue < 0.:
             stock_weight = interp(CS.out.radarDistance, [3., 25.], [1., 0.])
             if lead_objspd < 0:
-              vRel_weight = interp(abs(lead_objspd), [0, 20], [1, 2])
+              vRel_weight = interp(abs(lead_objspd), [0, 25], [1, 2])
               stock_weight = interp(CS.out.radarDistance, [3. ** vRel_weight, 25. * vRel_weight], [1., 0.])
           else:
             stock_weight = 0.

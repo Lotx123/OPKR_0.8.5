@@ -6,7 +6,6 @@ from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness,
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.params import Params
 
-GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName
 ButtonType = car.CarState.ButtonEvent.Type
 
@@ -22,19 +21,14 @@ class CarInterface(CarInterfaceBase):
 
   @staticmethod
   def compute_gb(accel, speed):
-    return float(accel) / 3.5
+    return float(accel) / 3.0
 
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=[]):  # pylint: disable=dangerous-default-value
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint)
 
     ret.carName = "hyundai"
-    ret.safetyModel = car.CarParams.SafetyModel.hyundaiLegacy
-    if candidate in [CAR.KONA_HEV, CAR.GRANDEUR_IG_FL_HEV, CAR.GRANDEUR_IG_FL]:
-      ret.safetyModel = car.CarParams.SafetyModel.hyundai
-    #if candidate in [CAR.SONATA]:
-    #  ret.safetyModel = car.CarParams.SafetyModel.hyundai
-
+    ret.safetyModel = car.CarParams.SafetyModel.hyundai
 
     params = Params()
     PidKp = float(int(params.get("PidKp", encoding="utf8")) * 0.01)
@@ -218,20 +212,22 @@ class CarInterface(CarInterfaceBase):
     ret.brakeMaxV = [0.7, 3.0]   # max brake allowed
 
     ret.longitudinalTuning.kpBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kpV = [1.3, 1.0, 0.6, 0.4, 0.3, 0.2]
+    ret.longitudinalTuning.kpV = [0.85, 0.72, 0.52, 0.4, 0.2, 0.1]
     ret.longitudinalTuning.kiBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kiV = [0.05, 0.1, 0.05, 0.04, 0.03, 0.02]
+    ret.longitudinalTuning.kiV = [0.02, 0.03, 0.03, 0.026, 0.02, 0.01]
 
-    ret.longitudinalTuning.deadzoneBP = [0., 9., 17.]
-    ret.longitudinalTuning.deadzoneV = [0., 0.005, 0.01]
+    ret.longitudinalTuning.deadzoneBP = [0., 9.]
+    ret.longitudinalTuning.deadzoneV = [0., 0.1]
     ret.longitudinalTuning.kdBP = [0., 4., 9., 17., 23., 31.]
-    ret.longitudinalTuning.kdV = [0.5, 0.6, 0.5, 0.4, 0.3, 0.2]
+    ret.longitudinalTuning.kdV = [0.8, 0.7, 0.62, 0.62, 0.3, 0.2]
+    ret.longitudinalTuning.kfBP = [0., 17., 31.]
+    ret.longitudinalTuning.kfV = [1., 1.0, 0.5]
 
     ret.enableCamera = True
     ret.enableBsm = 0x58b in fingerprint[0]
 
     ret.stoppingControl = True
-    ret.startAccel = 0.8
+    ret.startAccel = 1.0
 
     ret.standStill = False
     ret.vCruisekph = 0
@@ -370,7 +366,7 @@ class CarInterface(CarInterfaceBase):
     return self.CS.out
 
   def apply(self, c, sm):
-    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c, c.actuators,
+    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
                                c.cruiseControl.cancel, c.hudControl.visualAlert, c.hudControl.leftLaneVisible,
                                c.hudControl.rightLaneVisible, c.hudControl.leftLaneDepart, c.hudControl.rightLaneDepart,
                                c.hudControl.setSpeed, c.hudControl.leadVisible, c.hudControl.leadDistance,
