@@ -149,6 +149,7 @@ typedef struct UIScene {
   bool standStill;
   float limitSpeedCamera;
   float limitSpeedCameraDist;
+  float mapSign;
   float vSetDis;
   bool cruiseAccStatus;
   int laneless_mode;

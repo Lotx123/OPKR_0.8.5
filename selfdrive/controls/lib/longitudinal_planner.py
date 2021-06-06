@@ -24,7 +24,7 @@ AWARENESS_DECEL = -0.2     # car smoothly decel at .2m/s^2 when user is distract
 
 # lookup tables VS speed to determine min and max accels in cruise
 # make sure these accelerations are smaller than mpc limits
-_A_CRUISE_MIN_V = [-1.25, -1.0, -0.85, -.65, -.4]
+_A_CRUISE_MIN_V = [-0.75, -0.65, -0.6, -.5, -.30]
 _A_CRUISE_MIN_BP = [0.,  5.,  10., 20.,  40.]
 
 # need fast accel at very low speed for stop and go
@@ -124,6 +124,7 @@ class Planner():
     self.target_speed_map_dist = 0
     self.target_speed_map_block = False
     self.target_speed_map_sign = False
+    self.map_sign = 0.0
     self.vego = 0
 
   def choose_solution(self, v_cruise_setpoint, enabled, model_enabled):
@@ -188,6 +189,7 @@ class Planner():
         self.target_speed_map_counter_check = True
         os.system("logcat -d -s opkrspdlimit,opkrspd2limit | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCamera &")
         os.system("logcat -d -s opkrspddist | grep opkrspd | tail -n 1 | awk \'{print $7}\' > /data/params/d/LimitSetSpeedCameraDist &")
+        os.system("logcat -d -s opkrsigntype | tail -n 1 | awk \'{print $7}\' > /data/params/d/OpkrMapSign &")
         self.target_speed_map_counter3 += 1
         if self.target_speed_map_counter3 > 2:
           self.target_speed_map_counter3 = 0
@@ -196,38 +198,54 @@ class Planner():
         self.target_speed_map_counter1 = 0
         self.target_speed_map_counter = 0
         self.target_speed_map_counter_check = False
-        mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
-        mapspeeddist = self.params.get("LimitSetSpeedCameraDist", encoding="utf8")
-        if mapspeed is not None and mapspeeddist is not None:
-          mapspeed = int(float(mapspeed.rstrip('\n')))
-          mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
-          if mapspeed > 29:
-            self.target_speed_map = mapspeed
-            self.target_speed_map_dist = mapspeeddist
-            if self.target_speed_map_dist > 1001:
-              self.target_speed_map_block = True
-            self.target_speed_map_counter1 = 80
-            os.system("logcat -c &")
+        try:
+          mapspeed = self.params.get("LimitSetSpeedCamera", encoding="utf8")
+          mapspeeddist = self.params.get("LimitSetSpeedCameraDist", encoding="utf8")
+          mapsign = self.params.get("OpkrMapSign", encoding="utf8")
+          if mapsign is not None:
+            try:
+              mapsign = int(float(mapsign.rstrip('\n')))
+              self.map_sign = mapsign
+            except:
+              pass
           else:
+            mapsign = 0
+            self.map_sign = mapsign
+          if mapspeed is not None and mapspeeddist is not None:
+            try:
+              mapspeed = int(float(mapspeed.rstrip('\n')))
+              mapspeeddist = int(float(mapspeeddist.rstrip('\n')))
+            except:
+              pass
+            if mapspeed > 29:
+              self.target_speed_map = mapspeed
+              self.target_speed_map_dist = mapspeeddist
+              if self.target_speed_map_dist > 1001:
+                self.target_speed_map_block = True
+              self.target_speed_map_counter1 = 80
+              os.system("logcat -c &")
+            else:
+              self.target_speed_map = 0
+              self.target_speed_map_dist = 0
+              self.target_speed_map_block = False
+          elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
+            self.target_speed_map_counter2 += 1
+            self.target_speed_map_counter = 51
             self.target_speed_map = 0
             self.target_speed_map_dist = 0
+            self.target_speed_map_counter_check = True
             self.target_speed_map_block = False
-        elif mapspeed is None and mapspeeddist is None and self.target_speed_map_counter2 < 2:
-          self.target_speed_map_counter2 += 1
-          self.target_speed_map_counter = 51
-          self.target_speed_map = 0
-          self.target_speed_map_dist = 0
-          self.target_speed_map_counter_check = True
-          self.target_speed_map_block = False
-          self.target_speed_map_sign = False
-        else:
-          self.target_speed_map_counter = 49
-          self.target_speed_map_counter2 = 0
-          self.target_speed_map = 0
-          self.target_speed_map_dist = 0
-          self.target_speed_map_counter_check = False
-          self.target_speed_map_block = False
-          self.target_speed_map_sign = False
+            self.target_speed_map_sign = False
+          else:
+            self.target_speed_map_counter = 49
+            self.target_speed_map_counter2 = 0
+            self.target_speed_map = 0
+            self.target_speed_map_dist = 0
+            self.target_speed_map_counter_check = False
+            self.target_speed_map_block = False
+            self.target_speed_map_sign = False
+        except:
+          pass
 
     # Calculate speed for normal cruise control
     if enabled and not self.first_loop and not sm['carState'].brakePressed and not sm['carState'].gasPressed:
@@ -332,6 +350,7 @@ class Planner():
     longitudinalPlan.yRel2 = float(lead_2.yRel)
     longitudinalPlan.vRel2 = float(lead_2.vRel)
     longitudinalPlan.status2 = bool(lead_2.status)
+    longitudinalPlan.mapSign = float(self.map_sign)
     cam_distance_calc = 0
     cam_distance_calc = interp(self.vego*CV.MS_TO_KPH, [30,60,100,160], [3.75,5.5,6,7])
     consider_speed = interp((self.vego*CV.MS_TO_KPH - self.target_speed_map), [10, 30], [1, 1.3])
