@@ -76,23 +76,29 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
   mainLayout = new QVBoxLayout;
   mainLayout->setMargin(30);
 
-  QLabel* commaPrime = new QLabel("COMMA PRIME");
-  mainLayout->addWidget(commaPrime, 0, Qt::AlignTop);
+  QLabel* commaPrime = new QLabel("오픈파일럿");
+  mainLayout->addWidget(commaPrime, 0, Qt::AlignCenter);
+  mainLayout->addSpacing(15);
+  QPixmap hkgpix("../assets/offroad/hkg.png");
+  QLabel *hkg = new QLabel();
+  hkg->setPixmap(hkgpix.scaledToWidth(470, Qt::SmoothTransformation));
+  hkg->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+  mainLayout->addWidget(hkg, 0, Qt::AlignCenter);
 
   username = new QLabel();
-  username->setStyleSheet("font-size: 48px;"); // TODO: fit width
-  mainLayout->addWidget(username, 0, Qt::AlignTop);
+  username->setStyleSheet("font-size: 55px;"); // TODO: fit width
+  //mainLayout->addWidget(username, 0, Qt::AlignTop);
 
-  mainLayout->addSpacing(100);
+  //mainLayout->addSpacing(10);
 
   QLabel* commaPoints = new QLabel("COMMA POINTS");
   commaPoints->setStyleSheet(R"(
     color: #b8b8b8;
   )");
-  mainLayout->addWidget(commaPoints, 0, Qt::AlignTop);
+  //mainLayout->addWidget(commaPoints, 0, Qt::AlignTop);
 
   points = new QLabel();
-  mainLayout->addWidget(points, 0, Qt::AlignTop);
+  //mainLayout->addWidget(points, 0, Qt::AlignTop);
 
   setLayout(mainLayout);
   setStyleSheet(R"(
@@ -108,8 +114,8 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
     return;
   }
 
-  QString url = "https://api.commadotai.com/v1/devices/" + dongleId + "/owner";
-  RequestRepeater *repeater = new RequestRepeater(this, url, "ApiCache_Owner", 86400); // 6
+  QString url = "https://api.retropilot.org/v1/devices/" + dongleId + "/owner";
+  RequestRepeater *repeater = new RequestRepeater(this, url, "ApiCache_Owner", 6); // 6
   QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &PrimeUserWidget::replyFinished);
 }
 
@@ -240,8 +246,8 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
 
   // set up API requests
   QString dongleId = QString::fromStdString(Params().get("DongleId"));
-  QString url = "https://api.commadotai.com/v1.1/devices/" + dongleId + "/";
-  RequestRepeater* repeater = new RequestRepeater(this, url, "ApiCache_Device", 86400); // 5
+  QString url = "https://api.retropilot.org/v1.1/devices/" + dongleId + "/";
+  RequestRepeater* repeater = new RequestRepeater(this, url, "ApiCache_Device", 5); // 5
 
   QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &SetupWidget::replyFinished);
   QObject::connect(repeater, &RequestRepeater::failedResponse, this, &SetupWidget::parseError);
