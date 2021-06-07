@@ -1247,7 +1247,7 @@ static void ui_draw_vision_frame(UIState *s) {
 
 static void ui_draw_vision(UIState *s) {
   const UIScene *scene = &s->scene;
-  if (!scene->driver_view) {
+  //if (!scene->driver_view) {
     // Draw augmented elements
     if (scene->world_objects_visible) {
       ui_draw_world(s);
@@ -1260,7 +1260,7 @@ static void ui_draw_vision(UIState *s) {
         ui_draw_vision_car(s);
       }
     }
-  }
+  //}
 }
 
 static void ui_draw_background(UIState *s) {
