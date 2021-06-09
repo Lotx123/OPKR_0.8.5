@@ -206,7 +206,7 @@ struct CarState {
   rightBlindspot @34 :Bool; # Is there something blocking the right lane change
 
   brakeLights @19 :Bool;
-  # tpms 
+  # opkr-tpms
   tpmsPressureFl @37 :Float32;
   tpmsPressureFr @38 :Float32;
   tpmsPressureRl @39 :Float32;
@@ -220,6 +220,10 @@ struct CarState {
   driverAcc @46 :Bool;
   brakeHold @47 :Bool;    # AutoHold
   cruiseGapSet @48 :UInt8;
+
+  # opkr
+  safetyDist @49 :Float32;
+  safetySign @50 :Float32;
 
   struct WheelSpeeds {
     # optional wheel speeds

@@ -174,6 +174,10 @@ class CarState(CarStateBase):
       ret.tpmsPressureRl = cp.vl["TPMS11"]['PRESSURE_RL'] / 10 * 14.5038
       ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] / 10 * 14.5038
 
+    # OPKR
+    ret.safetyDist = cp.vl["NAVI"]['OPKR_S_Dist']
+    ret.safetySign = cp.vl["NAVI"]['OPKR_S_Sign']
+
     self.cruiseGapSet = cp_scc.vl["SCC11"]['TauGapSet']
     ret.cruiseGapSet = self.cruiseGapSet
 
@@ -436,6 +440,9 @@ class CarState(CarStateBase):
       ("PRESSURE_FR", "TPMS11", 0),
       ("PRESSURE_RL", "TPMS11", 0),
       ("PRESSURE_RR", "TPMS11", 0),
+
+      ("OPKR_S_Dist", "NAVI", 0),
+      ("OPKR_S_Sign", "NAVI", 0),
     ]
 
     checks = [
