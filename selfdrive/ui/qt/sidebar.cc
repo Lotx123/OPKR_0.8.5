@@ -57,7 +57,7 @@ void Sidebar::mousePressEvent(QMouseEvent *event) {
   // OPKR 
   if (home_btn.contains(event->pos())) {
       QUIState::ui_state.scene.homebtn_count = QUIState::ui_state.scene.homebtn_count + 1;
-    if (QUIState::ui_state.scene.homebtn_count > 1) {
+    if (QUIState::ui_state.scene.homebtn_count > 2) {
       QProcess::execute("/data/openpilot/run_mixplorer.sh");
     }
     return;
