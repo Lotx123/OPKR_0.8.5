@@ -90,6 +90,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     startupNoControl @77;
     startupMaster @78;
     startupFuzzyFingerprint @97;
+    startupNoFw @104;
     fcw @79;
     steerSaturated @80;
     belowEngageSpeed @84;
@@ -128,18 +129,18 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
     startupOneplusDEPRECATED @82;
-    laneChangeManual @104;
-    emgButtonManual @105;
-    driverSteering @106;
-    modeChangeOpenpilot @107;
-    modeChangeDistcurv @108;
-    modeChangeDistance @109;
-    modeChangeOneway @110;
-    modeChangeMaponly @111;
-    needBrake @112;
-    standStill @113;
-    modelLongAlert @114;
-	isgActive @115;
+    laneChangeManual @105;
+    emgButtonManual @106;
+    driverSteering @107;
+    modeChangeOpenpilot @108;
+    modeChangeDistcurv @109;
+    modeChangeDistance @110;
+    modeChangeOneway @111;
+    modeChangeMaponly @112;
+    needBrake @113;
+    standStill @114;
+    modelLongAlert @115;
+	isgActive @116;
   }
 }
 
@@ -206,7 +207,7 @@ struct CarState {
   rightBlindspot @34 :Bool; # Is there something blocking the right lane change
 
   brakeLights @19 :Bool;
-  # tpms 
+  # opkr-tpms
   tpmsPressureFl @37 :Float32;
   tpmsPressureFr @38 :Float32;
   tpmsPressureRl @39 :Float32;
@@ -221,6 +222,10 @@ struct CarState {
   brakeHold @47 :Bool;    # AutoHold
   cruiseGapSet @48 :UInt8;
   autoHold @49 : Int32;   
+
+  # opkr
+  safetyDist @49 :Float32;
+  safetySign @50 :Float32;
 
   struct WheelSpeeds {
     # optional wheel speeds

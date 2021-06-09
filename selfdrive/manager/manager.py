@@ -17,7 +17,7 @@ from selfdrive.hardware.eon.apk import (pm_apply_packages, update_apks)
 from selfdrive.manager.helpers import unblock_stdout
 from selfdrive.manager.process import ensure_running
 from selfdrive.manager.process_config import managed_processes
-from selfdrive.athena.registration import register
+from selfdrive.athena.registration import register, UNREGISTERED_DONGLE_ID
 from selfdrive.swaglog import cloudlog, add_file_handler
 from selfdrive.version import dirty, get_git_commit, version, origin, branch, commit, \
                               terms_version, training_version, comma_remote, \
@@ -34,7 +34,6 @@ def manager_init():
   default_params = [
     ("CompletedTrainingVersion", "0"),
     ("HasAcceptedTerms", "0"),
-    ("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')),
     ("OpenpilotEnabledToggle", "1"),
     ("IsOpenpilotViewEnabled", "0"),
     ("OpkrAutoShutdown", "2"),
@@ -67,11 +66,11 @@ def manager_init():
     ("PidKp", "20"),
     ("PidKi", "40"),
     ("PidKd", "150"),
-    ("PidKf", "5"),
+    ("PidKf", "6"),
     ("CameraOffsetAdj", "60"),
     ("SteerRatioAdj", "155"),
     ("SteerRatioMaxAdj", "175"),
-    ("SteerActuatorDelayAdj", "15"),
+    ("SteerActuatorDelayAdj", "20"),
     ("SteerRateCostAdj", "35"),
     ("SteerLimitTimerAdj", "40"),
     ("TireStiffnessFactorAdj", "85"),
@@ -95,11 +94,10 @@ def manager_init():
     ("OpkrSpeedLimitOffset", "0"),
     ("LimitSetSpeedCamera", "0"),
     ("LimitSetSpeedCameraDist", "0"),
-    ("OpkrMapSign", "0"),
     ("OpkrLiveSteerRatio", "1"),
     ("OpkrVariableSteerMax", "1"),
     ("OpkrVariableSteerDelta", "0"),
-    ("FingerprintTwoSet", "1"),
+    ("FingerprintTwoSet", "0"),
     ("OpkrVariableCruiseProfile", "0"),
     ("OpkrLiveTune", "0"),
     ("OpkrDrivingRecord", "0"),
@@ -134,7 +132,8 @@ def manager_init():
     ("WhitePandaSupport", "0"),
     ("SteerWarningFix", "0"),
   ]
-
+  if not PC:
+    default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
   if TICI:
     default_params.append(("EnableLteOnroad", "0"))
 
@@ -178,8 +177,6 @@ def manager_init():
   reg_res = register(show_spinner=True)
   if reg_res:
     dongle_id = reg_res
-  elif not reg_res:
-    dongle_id = ""
   else:
     serial = params.get("HardwareSerial")
     raise Exception(f"Registration failed for device {serial}")
@@ -191,17 +188,17 @@ def manager_init():
   cloudlog.bind_global(dongle_id=dongle_id, version=version, dirty=dirty,
                        device=HARDWARE.get_device_type())
 
+  if comma_remote and not (os.getenv("NOLOG") or os.getenv("NOCRASH") or PC):
+    crash.init()
+  crash.bind_user(id=dongle_id)
+  crash.bind_extra(dirty=dirty, origin=origin, branch=branch, commit=commit,
+                   device=HARDWARE.get_device_type())
+
   # ensure shared libraries are readable by apks
   if EON:
     os.chmod(BASEDIR, 0o755)
     os.chmod("/dev/shm", 0o777)
     os.chmod(os.path.join(BASEDIR, "cereal"), 0o755)
-
-  #if not (os.getenv("NOLOG") or os.getenv("NOCRASH") or PC):
-  #  crash.init()
-  crash.bind_user(id=dongle_id)
-  crash.bind_extra(dirty=dirty, origin=origin, branch=branch, commit=commit,
-                   device=HARDWARE.get_device_type())
 
   os.system("/data/openpilot/gitcommit.sh")
 
@@ -230,6 +227,8 @@ def manager_thread():
   params = Params()
 
   ignore = []
+  if params.get("DongleId", encoding='utf8') == UNREGISTERED_DONGLE_ID:
+    ignore += ["manage_athenad", "uploader"]
   if os.getenv("NOBOARD") is not None:
     ignore.append("pandad")
   if os.getenv("BLOCK") is not None:
