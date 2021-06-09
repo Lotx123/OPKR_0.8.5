@@ -25,11 +25,11 @@ IgnoreZone:1
 PidKp:20
 PidKi:40
 PidKd:150
-PidKf:5
+PidKf:6
 CameraOffsetAdj:60
 SteerRatioAdj:155
 SteerRatioMaxAdj:175
-SteerActuatorDelayAdj:15
+SteerActuatorDelayAdj:20
 SteerRateCostAdj:35
 SteerLimitTimerAdj:40
 TireStiffnessFactorAdj:85
@@ -54,7 +54,7 @@ OpkrSpeedLimitOffset:0
 OpkrLiveSteerRatio:1
 OpkrVariableSteerMax:1
 OpkrVariableSteerDelta:0
-FingerprintTwoSet:1
+FingerprintTwoSet:0
 OpkrVariableCruiseProfile:0
 OpkrLiveTune:0
 OpkrDrivingRecord:0
