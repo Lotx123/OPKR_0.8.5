@@ -54,7 +54,7 @@ OpkrSpeedLimitOffset:0
 OpkrLiveSteerRatio:1
 OpkrVariableSteerMax:1
 OpkrVariableSteerDelta:0
-FingerprintTwoSet:1
+FingerprintTwoSet:0
 OpkrVariableCruiseProfile:0
 OpkrLiveTune:0
 OpkrDrivingRecord:0
