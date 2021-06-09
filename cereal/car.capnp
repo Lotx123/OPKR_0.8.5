@@ -90,6 +90,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     startupNoControl @77;
     startupMaster @78;
     startupFuzzyFingerprint @97;
+    startupNoFw @104;
     fcw @79;
     steerSaturated @80;
     belowEngageSpeed @84;
@@ -128,18 +129,18 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     neosUpdateRequiredDEPRECATED @88;
     modelLagWarningDEPRECATED @93;
     startupOneplusDEPRECATED @82;
-    laneChangeManual @104;
-    emgButtonManual @105;
-    driverSteering @106;
-    modeChangeOpenpilot @107;
-    modeChangeDistcurv @108;
-    modeChangeDistance @109;
-    modeChangeOneway @110;
-    modeChangeMaponly @111;
-    needBrake @112;
-    standStill @113;
-    modelLongAlert @114;
-	isgActive @115;
+    laneChangeManual @105;
+    emgButtonManual @106;
+    driverSteering @107;
+    modeChangeOpenpilot @108;
+    modeChangeDistcurv @109;
+    modeChangeDistance @110;
+    modeChangeOneway @111;
+    modeChangeMaponly @112;
+    needBrake @113;
+    standStill @114;
+    modelLongAlert @115;
+	isgActive @116;
   }
 }
 

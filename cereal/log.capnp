@@ -549,7 +549,6 @@ struct ControlsState @0x97ff69c53601abf1 {
   limitSpeedCameraDist @63 :Float32;
   steerRatio @64 :Float32;
   longPlanSource  @65 :UInt8;
-  mapSign @66 :Float32;
 
   lateralControlState :union {
     indiState @52 :LateralINDIState;

@@ -4,8 +4,6 @@
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QVBoxLayout>
-#include <QProcess>
-#include <QSoundEffect>
 
 #include "selfdrive/common/params.h"
 #include "selfdrive/common/swaglog.h"
@@ -33,7 +31,7 @@ HomeWindow::HomeWindow(QWidget* parent) : QWidget(parent) {
   slayout->addWidget(onroad);
 
   QObject::connect(this, &HomeWindow::update, onroad, &OnroadWindow::update);
-  QObject::connect(this, &HomeWindow::offroadTransitionSignal, onroad, &OnroadWindow::offroadTransition);
+  QObject::connect(this, &HomeWindow::offroadTransitionSignal, onroad, &OnroadWindow::offroadTransitionSignal);
 
   home = new OffroadHome();
   slayout->addWidget(home);
@@ -52,9 +50,6 @@ void HomeWindow::offroadTransition(bool offroad) {
   if (offroad) {
     slayout->setCurrentWidget(home);
   } else {
-    if (onroad->map != nullptr){
-      onroad->map->setVisible(!Params().get("NavDestination").empty());
-    }
     slayout->setCurrentWidget(onroad);
   }
   sidebar->setVisible(offroad);
@@ -73,13 +68,13 @@ void HomeWindow::showDriverView(bool show) {
 
 void HomeWindow::mousePressEvent(QMouseEvent* e) {
   // OPKR REC
-  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.map_on_top && !QUIState::ui_state.scene.comma_stock_ui && rec_btn.ptInRect(e->x(), e->y())) {
+  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.comma_stock_ui && rec_btn.ptInRect(e->x(), e->y())) {
     QUIState::ui_state.scene.recording = !QUIState::ui_state.scene.recording;
     QUIState::ui_state.scene.touched = true;
     return;
   }
   // Laneless mode
-  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.map_on_top && QUIState::ui_state.scene.end_to_end && !QUIState::ui_state.scene.comma_stock_ui && laneless_btn.ptInRect(e->x(), e->y())) {
+  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && QUIState::ui_state.scene.end_to_end && !QUIState::ui_state.scene.comma_stock_ui && laneless_btn.ptInRect(e->x(), e->y())) {
     QUIState::ui_state.scene.laneless_mode = QUIState::ui_state.scene.laneless_mode + 1;
     if (QUIState::ui_state.scene.laneless_mode > 2) {
       QUIState::ui_state.scene.laneless_mode = 0;
@@ -94,7 +89,7 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
     return;
   }
   // Monitoring mode
-  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.map_on_top && monitoring_btn.ptInRect(e->x(), e->y())) {
+  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && monitoring_btn.ptInRect(e->x(), e->y())) {
     QUIState::ui_state.scene.monitoring_mode = QUIState::ui_state.scene.monitoring_mode + 1;
     if (QUIState::ui_state.scene.monitoring_mode > 1) {
       QUIState::ui_state.scene.monitoring_mode = 0;
@@ -107,7 +102,7 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
     return;
   }
   // // ML Button
-  // if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.map_on_top && QUIState::ui_state.scene.model_long && !QUIState::ui_state.scene.comma_stock_ui && ml_btn.ptInRect(e->x(), e->y())) {
+  // if (QUIState::ui_state.scene.started && !sidebar->isVisible() && QUIState::ui_state.scene.model_long && !QUIState::ui_state.scene.comma_stock_ui && ml_btn.ptInRect(e->x(), e->y())) {
   //   QUIState::ui_state.scene.mlButtonEnabled = !QUIState::ui_state.scene.mlButtonEnabled;
   //   if (QUIState::ui_state.scene.mlButtonEnabled) {
   //     Params().put("ModelLongEnabled", "1", 1);
@@ -117,7 +112,7 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
   //   return;
   // }
   // Stock UI Toggle
-  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && !QUIState::ui_state.scene.map_on_top && stockui_btn.ptInRect(e->x(), e->y())) {
+  if (QUIState::ui_state.scene.started && !sidebar->isVisible() && stockui_btn.ptInRect(e->x(), e->y())) {
     QUIState::ui_state.scene.comma_stock_ui = !QUIState::ui_state.scene.comma_stock_ui;
     if (QUIState::ui_state.scene.comma_stock_ui) {
       Params().put("CommaStockUI", "1", 1);
@@ -128,6 +123,8 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
   }
   // Handle sidebar collapsing
   if (onroad->isVisible() && (!sidebar->isVisible() || e->x() > sidebar->width())) {
+
+    // TODO: Handle this without exposing pointer to map widget
     // Hide map first if visible, then hide sidebar
     if (onroad->map != nullptr && onroad->map->isVisible()){
       onroad->map->setVisible(false);

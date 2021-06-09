@@ -294,6 +294,14 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
     ET.PERMANENT: startup_fuzzy_fingerprint_alert,
   },
 
+  EventName.startupNoFw: {
+    ET.PERMANENT: Alert(
+      "차량 인식 불가",
+      "모든 연결부위를 점검하세요",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 0., 0., 15.),
+  },
+
   EventName.dashcamMode: {
     ET.PERMANENT: Alert(
       "대시캠 모드",
@@ -539,6 +547,10 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
 
   EventName.gpsMalfunction: {
     ET.PERMANENT: NormalPermanentAlert("GPS 오작동", "서비스팀에 문의하세요"),
+  },
+
+  EventName.localizerMalfunction: {
+    ET.PERMANENT: NormalPermanentAlert("로컬라이저 불안정", "서포트에 문의하세요"),
   },
 
   EventName.modeChangeOpenpilot: {

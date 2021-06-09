@@ -106,8 +106,6 @@ typedef struct UIScene {
   bool brakePress;
   bool recording;
   bool touched;
-  bool map_on_top;
-  bool map_on_overlay;
 
   float gpsAccuracyUblox;
   float altitudeUblox;

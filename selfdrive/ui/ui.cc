@@ -56,8 +56,6 @@ static void ui_init_vision(UIState *s) {
   assert(glGetError() == GL_NO_ERROR);
   s->scene.recording = false;
   s->scene.touched = false;
-  s->scene.map_on_top = false;
-  s->scene.map_on_overlay = false;
   s->scene.setbtn_count = 0;
   s->scene.homebtn_count = 0;
   s->scene.mlButtonEnabled = false;
@@ -128,11 +126,7 @@ static void update_model(UIState *s, const cereal::ModelDataV2::Reader &model) {
     max_distance = std::clamp((float)(lead_d - fmin(lead_d * 0.35, 10.)), 0.0f, max_distance);
   }
   max_idx = get_path_length_idx(model_position, max_distance);
-  if (scene.map_on_overlay) {
-    update_line_data(s, model_position, 0.7, 1.22, &scene.track_vertices, max_idx);
-  } else {
-    update_line_data(s, model_position, 0.5, 1.22, &scene.track_vertices, max_idx);
-  }
+  update_line_data(s, model_position, 0.5, 1.22, &scene.track_vertices, max_idx);
 }
 
 static void update_sockets(UIState *s){
