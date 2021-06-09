@@ -43,6 +43,8 @@ class CarState(CarStateBase):
 
     self.brake_check = False
     self.cancel_check = False
+    self.safety_sign = 0
+
   def update(self, cp, cp2, cp_cam):
     cp_mdps = cp2 if self.CP.mdpsBus == 1 else cp
     cp_sas = cp2 if self.CP.sasBus else cp
@@ -176,7 +178,17 @@ class CarState(CarStateBase):
 
     # OPKR
     ret.safetyDist = cp.vl["NAVI"]['OPKR_S_Dist']
-    ret.safetySign = cp.vl["NAVI"]['OPKR_S_Sign']
+    self.safety_sign = cp.vl["NAVI"]['OPKR_S_Sign']
+    if self.safety_sign == 25.:
+      ret.safetySign = 30.
+    elif self.safety_sign == 9.:
+      ret.safetySign = 50.
+    elif self.safety_sign == 17.:
+      ret.safetySign = 60.
+    elif self.safety_sign in [16., 18.]:
+      ret.safetySign = 100.
+    else:
+      ret.safetySign = 0.
 
     self.cruiseGapSet = cp_scc.vl["SCC11"]['TauGapSet']
     ret.cruiseGapSet = self.cruiseGapSet
