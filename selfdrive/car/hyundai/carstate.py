@@ -181,7 +181,7 @@ class CarState(CarStateBase):
 
     # OPKR
     self.safety_dist = cp.vl["NAVI"]['OPKR_S_Dist']
-    self.safety_sign = cp.vl["NAVI"]['OPKR_S_Sign']
+    self.safety_sign_check = cp.vl["NAVI"]['OPKR_S_Sign']
     if self.safety_sign_check == 25.:
       self.safety_sign = 30.
     elif self.safety_sign_check == 9.:
