@@ -5,6 +5,7 @@ from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from selfdrive.config import Conversions as CV
 from selfdrive.car.hyundai.spdcontroller  import SpdController
+from common.numpy_fast import interp
 from common.params import Params
 
 GearShifter = car.CarState.GearShifter
@@ -43,7 +44,9 @@ class CarState(CarStateBase):
 
     self.brake_check = False
     self.cancel_check = False
+    self.safety_sign_check = 0
     self.safety_sign = 0
+    self.safety_dist = 0
 
   def update(self, cp, cp2, cp_cam):
     cp_mdps = cp2 if self.CP.mdpsBus == 1 else cp
@@ -177,18 +180,26 @@ class CarState(CarStateBase):
       ret.tpmsPressureRr = cp.vl["TPMS11"]['PRESSURE_RR'] / 10 * 14.5038
 
     # OPKR
-    ret.safetyDist = cp.vl["NAVI"]['OPKR_S_Dist']
+    self.safety_dist = cp.vl["NAVI"]['OPKR_S_Dist']
     self.safety_sign = cp.vl["NAVI"]['OPKR_S_Sign']
-    if self.safety_sign == 25.:
-      ret.safetySign = 30.
-    elif self.safety_sign == 9.:
-      ret.safetySign = 50.
-    elif self.safety_sign == 17.:
-      ret.safetySign = 60.
-    elif self.safety_sign in [16., 18.]:
-      ret.safetySign = 100.
+    if self.safety_sign_check == 25.:
+      self.safety_sign = 30.
+    elif self.safety_sign_check == 9.:
+      self.safety_sign = 50.
+    elif self.safety_sign_check == 17.:
+      self.safety_sign = 60.
+    elif self.safety_sign_check in [16., 18.]:
+      self.safety_sign = 100.
     else:
-      ret.safetySign = 0.
+      self.safety_sign = 0.
+    cam_distance_calc = interp(ret.vEgo, [30,60,100,160], [3.75,5.5,6,7])
+    consider_speed = interp((ret.vEgo - self.safety_sign), [10, 30], [1, 1.3])
+    if self.safety_sign > 29 and self.safety_dist < cam_distance_calc*consider_speed*ret.vEgo:
+      ret.safetySign = self.safety_sign
+      ret.safetyDist = self.safety_dist
+    else:
+      ret.safetySign = 0
+      ret.safetyDist = 0
 
     self.cruiseGapSet = cp_scc.vl["SCC11"]['TauGapSet']
     ret.cruiseGapSet = self.cruiseGapSet
