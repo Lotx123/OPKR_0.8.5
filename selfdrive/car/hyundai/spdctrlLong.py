@@ -39,7 +39,7 @@ class SpdctrlLong(SpdController):
         dRele = plan.dRel1 #EON Lead
         yRele = plan.yRel1 #EON Lead
         vRele = plan.vRel1 * 3.6 + 0.5 #EON Lead
-        self.target_speed_camera = plan.targetSpeedCamera + round(plan.targetSpeedCamera*0.01*self.map_spdlimit_offset)
+        self.target_speed_camera = CS.out.safetySign + round(CS.out.safetySign*0.01*self.map_spdlimit_offset)
         
         if self.target_speed_camera <= 29:
             self.map_enable = False

@@ -269,9 +269,7 @@ class Controls:
       self.events.add(EventName.usbError)
     elif not self.sm.all_alive_and_valid() and self.sm['pandaState'].pandaType != PandaType.whitePanda and not self.commIssue_ignored:
       self.delayed_comm_issue_timer += 1
-      if self.delayed_comm_issue_timer > 150 and not Params().get_bool("OpkrMapEnable"):
-        self.events.add(EventName.commIssue)
-      elif self.delayed_comm_issue_timer > 300 and Params().get_bool("OpkrMapEnable"):
+      if self.delayed_comm_issue_timer > 150:
         self.events.add(EventName.commIssue)
       if not self.logged_comm_issue:
         cloudlog.error(f"commIssue - valid: {self.sm.valid} - alive: {self.sm.alive}")
@@ -672,9 +670,8 @@ class Controls:
     controlsState.canErrorCounter = self.can_error_counter
     controlsState.alertTextMsg1 = self.log_alertTextMsg1
     controlsState.alertTextMsg2 = self.log_alertTextMsg2
-    controlsState.limitSpeedCamera = float(self.sm['longitudinalPlan'].targetSpeedCamera)
-    controlsState.limitSpeedCameraDist = float(self.sm['longitudinalPlan'].targetSpeedCameraDist)
-    controlsState.mapSign = float(self.sm['longitudinalPlan'].mapSign)
+    controlsState.limitSpeedCamera = float(CS.safetySign)
+    controlsState.limitSpeedCameraDist = float(CS.safetyDist)
     controlsState.lateralControlMethod = int(self.lateral_control_method)
     controlsState.steerRatio = float(self.steerRatio_to_send)
 

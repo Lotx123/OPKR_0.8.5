@@ -166,7 +166,6 @@ static void update_state(UIState *s) {
 
     scene.limitSpeedCamera = scene.controls_state.getLimitSpeedCamera();
     scene.limitSpeedCameraDist = scene.controls_state.getLimitSpeedCameraDist();
-    scene.mapSign = scene.controls_state.getMapSign();
     scene.steerRatio = scene.controls_state.getSteerRatio();
     scene.long_plan_source = scene.controls_state.getLongPlanSource();
   }
@@ -382,10 +381,8 @@ static void update_status(UIState *s) {
       s->scene.scr.nTime = s->scene.scr.autoScreenOff * 60 * UI_FREQ;
       s->scene.comma_stock_ui = Params().getBool("CommaStockUI");
       Params().put("ModelLongEnabled", "0", 1);
-      Params().put("OpkrMapEnable", "0", 1);
       Params().put("LimitSetSpeedCamera", "0", 1);
       Params().put("LimitSetSpeedCameraDist", "0", 1);
-      Params().put("OpkrMapSign", "0", 1);
     } else {
       s->vipc_client->connected = false;
     }
