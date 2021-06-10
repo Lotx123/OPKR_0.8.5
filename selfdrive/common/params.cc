@@ -315,6 +315,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"OpkrFanSpeedGain", PERSISTENT},
     {"CommaStockUI", PERSISTENT},
     {"OpkrEnableUploader", PERSISTENT},
+    {"OpkrMapEnable", PERSISTENT},
     {"WhitePandaSupport", PERSISTENT},
     {"SteerWarningFix", PERSISTENT},
 };

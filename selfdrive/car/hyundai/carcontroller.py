@@ -162,6 +162,7 @@ class CarController():
     self.vRel2 = 0
     self.lead2_status = False
     self.cut_in_detection = 0
+    self.target_map_speed_camera = 0
 
     self.cruise_gap = 0.0
     self.cruise_gap_prev = 0
@@ -228,6 +229,7 @@ class CarController():
     self.yRel2 = int(plan.yRel2) #EON Lead
     self.vRel2 = int(plan.vRel2 * 3.6 + 0.5) #EON Lead
     self.lead2_status = plan.status2
+    self.target_map_speed_camera = plan.targetSpeedCamera
 
     lateral_plan = sm['lateralPlan']
     self.outScale = lateral_plan.outputScale
@@ -334,7 +336,7 @@ class CarController():
       if frame % 2: # send clu11 to mdps if it is not on bus 0
         can_sends.append(create_clu11(self.packer, frame, CS.clu11, Buttons.NONE, enabled_speed, CS.CP.mdpsBus))
 
-    str_log1 = 'CV={:03.0f} AS={:03.1f} TQ={:03.0f} ST={:03.0f}/{:01.0f}/{:01.0f} AQ={:+04.2f} S={:.0f}'.format(abs(self.curve_speed), abs(self.anglesteer_desire), abs(new_steer), max(self.steerMax, abs(new_steer)), self.steerDeltaUp, self.steerDeltaDown, CS.scc12["aReqValue"], CS.safety_sign_check)
+    str_log1 = 'CV={:03.0f}  AS={:03.1f}  TQ={:03.0f}  ST={:03.0f}/{:01.0f}/{:01.0f} AQ={:+04.2f}'.format(abs(self.curve_speed), abs(self.anglesteer_desire), abs(new_steer), max(self.steerMax, abs(new_steer)), self.steerDeltaUp, self.steerDeltaDown, CS.scc12["aReqValue"])
 
     try:
       if self.params.get_bool("OpkrLiveTune"):

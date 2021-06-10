@@ -335,8 +335,13 @@ class SpdController():
         delta = int(round(set_speed)) - int(CS.VSetDis)
         dec_step_cmd = 1
 
-        self.map_spd_camera = CS.out.safetySign
-        self.map_spd_enable = True if self.map_spd_camera > 29. else False
+        camspeed = Params().get("LimitSetSpeedCamera", encoding="utf8")
+        if camspeed is not None:
+            self.map_spd_camera = int(float(camspeed.rstrip('\n')))
+            self.map_spd_enable = self.map_spd_camera > 29
+        else:
+            self.map_spd_enable = False
+            self.map_spd_camera = 0
 
         if self.long_curv_timer < long_wait_cmd:
             pass
