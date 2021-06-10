@@ -221,7 +221,7 @@ struct CarState {
   driverAcc @46 :Bool;
   brakeHold @47 :Bool;    # AutoHold
   cruiseGapSet @48 :UInt8;
-  autoHold @51 : Int32;   
+  autoHold @49 : Int32;   
 
   # opkr
   safetyDist @49 :Float32;
