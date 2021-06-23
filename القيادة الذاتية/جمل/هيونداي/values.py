@@ -478,7 +478,13 @@ if Params().get_bool("FingerprintTwoSet"):
         b'\xf1\x87LDLVBN5600981KF26\x86fff\x87vgfg\x88\x96xfw\x86gfw\x86g\x95\xf6\xffeU_\xff\x92c\xf1\x81U891\x00\x00\x00\x00\x00\x00\xf1\x00bcsh8p54  U891\x00\x00\x00\x00\x00\x00SLX4G38NB2\xafL]\xe7',
         b'\xf1\x87LBLUFN655162KF36\x98\x88\x88\x88\x98\x88\x88\x88x\x99\xa7\x89x\x99\xa7\x89x\x99\x97\x89g\xf7\xffwU_\xff\xe9!\xf1\x81U891\x00\x00\x00\x00\x00\x00\xf1\x00bcsh8p54 U891\x00\x00\x00\x00\x00\x00SLX2G38NB3\xd1\xc3\xf8\xa8',
       ],
-    },
+      CAR.K7: {
+        (Ecu.eps, ®x7d4, None): [
+            b'\xf1\@00YG  MDPS C 1.00 1.00 99800-F6563\000 4YGAC100',], 
+        (Ecu.fwdCamera, 0x7c4, None): [
+            b'\xf1\000YG MFC LKAS 1.00 1.01 95740-F6100 170717',],
+       ],
+
     CAR.VELOSTER: {
       (Ecu.fwdRadar, 0x7d0, None): [b'\xf1\x00JS__ SCC H-CUP      1.00 1.02 95650-J3200         ',],
       (Ecu.esp, 0x7d1, None): [b'\xf1\x00\x00\x00\x00\x00\x00\x00',],
